@@ -1,1 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Future Me Dashboard — Shaq Mode</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--card:#14141f;--card2:#1a1a2e;--accent:#6c3fff;--accent2:#a855f7;--gold:#fbbf24;--green:#22c55e;--red:#ef4444;--orange:#f97316;--cyan:#06b6d4;--text:#f0f0f5;--muted:#8888aa;--border:#2a2a3e;--shadow:0 4px 24px rgba(0,0,0,.4)}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+nav{background:linear-gradient(135deg,#14141f,#1e1e35);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+nav .logo{font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+nav .links{display:flex;gap:.5rem}
+nav .links a{color:var(--muted);text-decoration:none;padding:.5rem 1rem;border-radius:8px;font-weight:600;font-size:.9rem;transition:all .2s}
+nav .links a:hover,nav .links a.active{color:var(--text);background:var(--accent);box-shadow:0 0 20px rgba(108,63,255,.3)}
+.container{max-width:1100px;margin:0 auto;padding:1.5rem}
+.page{display:none}.page.active{display:block}
+h1{font-size:2.2rem;font-weight:900;margin-bottom:.5rem}
+h2{font-size:1.5rem;font-weight:800;margin-bottom:1rem}
+h3{font-size:1.1rem;font-weight:700}
+.banner{background:linear-gradient(135deg,var(--accent),#4a1fd4,var(--gold));border-radius:16px;padding:2rem;text-align:center;margin-bottom:2rem;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.banner::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.banner h1{font-size:2.5rem;text-shadow:0 2px 10px rgba(0,0,0,.3)}
+.banner .quote{font-size:1.15rem;margin-top:.75rem;font-style:italic;opacity:.95;min-height:2em}
+.banner .label{font-size:.75rem;text-transform:uppercase;letter-spacing:3px;opacity:.7;margin-top:.5rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);transition:transform .15s}
+.card:hover{transform:translateY(-2px)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr}}
+.score-ring{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:900;margin:0 auto 1rem;position:relative}
+.score-ring .pct{position:relative;z-index:1}
+.tier{font-size:1rem;font-weight:700;text-align:center;padding:.75rem;border-radius:10px;margin-top:.75rem}
+.tag{display:inline-block;padding:.2rem .65rem;border-radius:20px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.tag-career{background:#6c3fff33;color:var(--accent2)}
+.tag-money{background:#fbbf2433;color:var(--gold)}
+.tag-health{background:#22c55e33;color:var(--green)}
+.tag-family{background:#ef444433;color:var(--red)}
+.tag-lifestyle{background:#06b6d433;color:var(--cyan)}
+.tag-skills{background:#f9731633;color:var(--orange)}
+.status-cold{color:#60a5fa}.status-warm{color:var(--orange)}.status-active{color:var(--green)}
+.overdue{background:rgba(239,68,68,.1);border-left:3px solid var(--red)}
+input,textarea,select{background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.6rem .8rem;font-size:.9rem;width:100%;font-family:inherit;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,63,255,.2)}
+textarea{resize:vertical;min-height:60px}
+label{font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:.3rem;display:block}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+.btn{padding:.6rem 1.2rem;border:none;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#5a2ee0;box-shadow:0 0 20px rgba(108,63,255,.4)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red)}.btn-danger:hover{background:var(--red);color:#fff}
+.btn-sm{padding:.35rem .75rem;font-size:.78rem}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+.checklist-item{display:flex;align-items:center;gap:.75rem;padding:.65rem .85rem;border-radius:10px;margin-bottom:.5rem;background:var(--card2);border:1px solid var(--border);transition:all .2s}
+.checklist-item.checked{opacity:.6;text-decoration:line-through}
+.checklist-item input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.checklist-item .edit-input{background:transparent;border:none;color:var(--text);font-size:.9rem;padding:0;flex:1}
+.checklist-item .edit-input:focus{border-bottom:1px solid var(--accent)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;padding:.6rem;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:.6rem;border-bottom:1px solid var(--border)}
+tr:hover{background:rgba(108,63,255,.05)}
+.flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+.mb1{margin-bottom:1rem}.mb2{margin-bottom:2rem}.mt1{margin-top:1rem}
+.text-muted{color:var(--muted)}.text-sm{font-size:.85rem}
+.goal-img{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:.75rem}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.modal h2{margin-bottom:1.25rem}
+.hidden{display:none!important}
+.filter-bar{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.filter-btn{padding:.4rem .9rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
+.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dash-section{margin-bottom:1.5rem}
+.mini-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.5rem}
+.actions{display:flex;gap:.35rem}
+</style>
+</head>
+<body>
 
+<nav>
+  <div class="logo">FUTURE ME</div>
+  <div class="links">
+    <a href="#" data-page="dashboard" class="active">Dashboard</a>
+    <a href="#" data-page="vision">Vision Board</a>
+    <a href="#" data-page="tracker">Momentum</a>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="page active">
+    <div class="banner" id="quoteBanner">
+      <h1>SHAQ MODE</h1>
+      <div class="quote" id="quoteText"></div>
+      <div class="label">Championship Mindset</div>
+    </div>
+    <div class="grid2 dash-section">
+      <div class="card">
+        <h3 class="text-muted" style="margin-bottom:.75rem">MOMENTUM SCORE</h3>
+        <div class="score-ring" id="dashScore"></div>
+        <div class="tier" id="dashTier"></div>
+      </div>
+      <div class="card">
+        <h3 class="text-muted" style="margin-bottom:.75rem">UPCOMING FOLLOW-UPS</h3>
+        <div id="dashFollowups"></div>
+      </div>
+    </div>
+    <div class="card dash-section">
+      <h3 class="text-muted" style="margin-bottom:.75rem">RECENT VISION GOALS</h3>
+      <div class="grid3" id="dashGoals"></div>
+    </div>
+  </div>
+
+  <!-- VISION BOARD -->
+  <div id="vision" class="page">
+    <div class="flex-between mb2">
+      <h1>Vision Board</h1>
+      <button class="btn btn-primary" onclick="openGoalModal()">+ Add Goal</button>
+    </div>
+    <div class="filter-bar" id="visionFilters"></div>
+    <div class="grid3" id="goalsGrid"></div>
+  </div>
+
+  <!-- TRACKER -->
+  <div id="tracker" class="page">
+    <h1 class="mb2">Momentum + Networking</h1>
+    <div class="grid2">
+      <div class="card">
+        <div class="flex-between mb1">
+          <h2>Weekly Checklist</h2>
+          <button class="btn btn-sm btn-ghost" onclick="resetChecklist()">Reset Week</button>
+        </div>
+        <div id="checklistContainer"></div>
+        <div class="score-ring mt1" id="trackerScore"></div>
+        <div class="tier" id="trackerTier"></div>
+      </div>
+      <div class="card">
+        <div class="flex-between mb1">
+          <h2>Networking</h2>
+          <button class="btn btn-primary btn-sm" onclick="openContactModal()">+ Contact</button>
+        </div>
+        <div class="filter-bar mb1">
+          <button class="filter-btn active" data-nf="all" onclick="setNetFilter('all',this)">All</button>
+          <button class="filter-btn" data-nf="overdue" onclick="setNetFilter('overdue',this)">Overdue Only</button>
+          <button class="filter-btn" data-nf="active" onclick="setNetFilter('active',this)">Active</button>
+          <button class="filter-btn" data-nf="warm" onclick="setNetFilter('warm',this)">Warm</button>
+          <button class="filter-btn" data-nf="cold" onclick="setNetFilter('cold',this)">Cold</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Company</th><th>Status</th><th>Follow-up</th><th></th></tr></thead>
+            <tbody id="contactsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GOAL MODAL -->
+<div id="goalModal" class="modal-overlay hidden" onclick="if(event.target===this)closeGoalModal()">
+  <div class="modal">
+    <h2 id="goalModalTitle">Add Goal</h2>
+    <input type="hidden" id="goalId">
+    <div class="mb1"><label>Title</label><input id="goalTitle" placeholder="My big goal"></div>
+    <div class="form-row">
+      <div><label>Category</label>
+        <select id="goalCategory">
+          <option value="Career">Career (Brand Bag)</option>
+          <option value="Money">Money (Stack Season)</option>
+          <option value="Health">Health (Body = Engine)</option>
+          <option value="Family">Family (My Why)</option>
+          <option value="Lifestyle">Lifestyle (Big Dreams)</option>
+          <option value="Skills">Skills (Level Up)</option>
+        </select>
+      </div>
+      <div><label>Image (optional)</label><input type="file" id="goalImage" accept="image/*" onchange="handleImg(this)"></div>
+    </div>
+    <div class="mb1"><label>Why It Matters</label><textarea id="goalWhy" placeholder="What drives this goal?"></textarea></div>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeGoalModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveGoal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div id="contactModal" class="modal-overlay hidden" onclick="if(event.target===this)closeContactModal()">
+  <div class="modal">
+    <h2 id="contactModalTitle">Add Contact</h2>
+    <input type="hidden" id="contactId">
+    <div class="form-row"><div><label>Name</label><input id="cName" placeholder="Name"></div><div><label>Company</label><input id="cCompany" placeholder="Company"></div></div>
+    <div class="form-row"><div><label>Role</label><input id="cRole" placeholder="Role/Title"></div><div><label>Status</label><select id="cStatus"><option>Cold</option><option>Warm</option><option>Active</option></select></div></div>
+    <div class="form-row"><div><label>Last Contact</label><input type="date" id="cLast"></div><div><label>Next Follow-up</label><input type="date" id="cNext"></div></div>
+    <div class="mb1"><label>Notes</label><textarea id="cNotes" placeholder="Notes about this contact"></textarea></div>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeContactModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveContact()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────
+const QUOTES=[
+  "Excellence is not a singular act, but a habit. You are what you repeatedly do. — Shaq",
+  "I'm tired of hearing about money, money, money. I just want to play the game, drink Pepsi, wear Reebok. — Shaq",
+  "I'd like to be known as a winner, a champion. — Shaq",
+  "I never worry about the problem. I worry about the solution. — Shaq",
+  "I'm the Big Aristotle... because it was said that Aristotle was the smartest man ever. — Shaq",
+  "Don't ever let someone tell you that you can't do something. You got a dream, you gotta protect it. — Pursuit of Happyness",
+  "Hard work beats talent when talent doesn't work hard. — Tim Notke",
+  "The only way to prove you're a good sport is to lose. — Ernie Banks",
+  "Be so good they can't ignore you. — Steve Martin",
+  "I got lucky because I never gave up the search. — Shaq"
+];
+
+const DEFAULT_ITEMS=[
+  "Applied to 2+ roles","Sent 3 networking messages","Scheduled/held a coffee chat",
+  "60+ mins interview prep","Finished key class deliverable","Studied 2+ sessions",
+  "Workout 3x","Ate decent 4+ days","Slept 7+ hrs 4 nights","Built something 1 session"
+];
+
+const CATS={Career:'career',Money:'money',Health:'health',Family:'family',Lifestyle:'lifestyle',Skills:'skills'};
+
+let data={checklist:[],goals:[],contacts:[]};
+let tempImg='';
+let netFilter='all';
+let visFilter='all';
+let quoteIdx=0;
+
+function loadData(){
+  try{
+    let s=localStorage.getItem('futureMeData');
+    if(s)data=JSON.parse(s);
+  }catch(e){}
+  if(!data.checklist||!data.checklist.length){
+    data.checklist=DEFAULT_ITEMS.map((t,i)=>({id:i,text:t,done:false}));
+    saveData();
+  }
+}
+function saveData(){try{localStorage.setItem('futureMeData',JSON.stringify(data))}catch(e){}}
+
+// ─── SCORE ────────────────────────────────────────
+function getScore(){
+  let c=data.checklist,done=c.filter(x=>x.done).length;
+  return c.length?Math.round(done/c.length*100):0;
+}
+function getTier(s){
+  if(s>=90)return{msg:"That's championship behavior. 🏆",color:'var(--gold)'};
+  if(s>=70)return{msg:"Now you moving like a pro. 💪",color:'var(--green)'};
+  if(s>=40)return{msg:"Better… but you still warming up. 🔥",color:'var(--orange)'};
+  return{msg:"We not doing that. Lock in. 😤",color:'var(--red)'};
+}
+
+function renderScoreRing(el,tierEl){
+  let s=getScore(),t=getTier(s);
+  el.innerHTML=`<span class="pct">${s}%</span>`;
+  el.style.background=`conic-gradient(${t.color} ${s*3.6}deg, var(--card2) 0deg)`;
+  tierEl.textContent=t.msg;
+  tierEl.style.background=t.color+'22';tierEl.style.color=t.color;
+}
+
+// ─── NAVIGATION ───────────────────────────────────
+document.querySelectorAll('nav .links a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    let p=a.dataset.page;
+    document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+    document.getElementById(p==='dashboard'?'dashboard':p==='vision'?'vision':'tracker').classList.add('active');
+    document.querySelectorAll('nav .links a').forEach(l=>l.classList.remove('active'));
+    a.classList.add('active');
+    if(p==='dashboard')renderDashboard();
+    else if(p==='vision')renderVision();
+    else renderTracker();
+  });
+});
+
+// ─── DASHBOARD ────────────────────────────────────
+function renderDashboard(){
+  renderScoreRing(document.getElementById('dashScore'),document.getElementById('dashTier'));
+  // Recent goals
+  let g=document.getElementById('dashGoals');
+  let recent=[...data.goals].reverse().slice(0,3);
+  g.innerHTML=recent.length?recent.map(gl=>`<div class="mini-card">
+    ${gl.image?`<img src="${gl.image}" class="goal-img" alt="">`:''}
+    <span class="tag tag-${CATS[gl.category]||'career'}">${gl.category}</span>
+    <h3 style="margin-top:.4rem">${esc(gl.title)}</h3>
+    <p class="text-sm text-muted" style="margin-top:.3rem">${esc(gl.why||'')}</p>
+  </div>`).join(''):'<p class="text-muted">No goals yet. Add some on the Vision Board!</p>';
+  // Follow-ups
+  let f=document.getElementById('dashFollowups'),today=todayStr();
+  let sorted=[...data.contacts].filter(c=>c.nextFollowUp).sort((a,b)=>a.nextFollowUp.localeCompare(b.nextFollowUp)).slice(0,5);
+  f.innerHTML=sorted.length?sorted.map(c=>{
+    let over=c.nextFollowUp<today;
+    return`<div class="mini-card${over?' overdue':''}" style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>${esc(c.name)}</strong> <span class="text-sm text-muted">— ${esc(c.company||'')}</span></div>
+      <div class="text-sm" style="color:${over?'var(--red)':'var(--muted)'}">${c.nextFollowUp}${over?' ⚠️':''}</div>
+    </div>`;
+  }).join(''):'<p class="text-muted">No follow-ups scheduled.</p>';
+}
+
+// ─── QUOTE ROTATOR ────────────────────────────────
+function rotateQuote(){
+  quoteIdx=(quoteIdx+1)%QUOTES.length;
+  let el=document.getElementById('quoteText');
+  el.style.opacity=0;
+  setTimeout(()=>{el.textContent=`"${QUOTES[quoteIdx]}"`;el.style.opacity=1},300);
+}
+
+// ─── VISION BOARD ─────────────────────────────────
+function renderVision(){
+  // filters
+  let fb=document.getElementById('visionFilters');
+  let cats=['all','Career','Money','Health','Family','Lifestyle','Skills'];
+  fb.innerHTML=cats.map(c=>`<button class="filter-btn${visFilter===(c==='all'?'all':c)?'active':''}" onclick="setVisFilter('${c}')">${c==='all'?'All':c}</button>`).join('');
+  fb.querySelectorAll('.filter-btn').forEach(b=>{if((visFilter==='all'&&b.textContent==='All')||(b.textContent===visFilter))b.classList.add('active');else b.classList.remove('active')});
+
+  let filtered=visFilter==='all'?data.goals:data.goals.filter(g=>g.category===visFilter);
+  let grid=document.getElementById('goalsGrid');
+  grid.innerHTML=filtered.length?filtered.map(g=>`<div class="card">
+    ${g.image?`<img src="${g.image}" class="goal-img" alt="">`:''}
+    <span class="tag tag-${CATS[g.category]||'career'}">${g.category}</span>
+    <h3 style="margin-top:.5rem">${esc(g.title)}</h3>
+    <p class="text-sm text-muted" style="margin-top:.3rem">${esc(g.why||'')}</p>
+    <div class="actions mt1">
+      <button class="btn btn-sm btn-ghost" onclick="editGoal('${g.id}')">Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteGoal('${g.id}')">Delete</button>
+    </div>
+  </div>`).join(''):'<p class="text-muted">No goals yet. Time to dream big!</p>';
+}
+
+function setVisFilter(c){visFilter=c;renderVision()}
+
+function openGoalModal(id){
+  document.getElementById('goalModal').classList.remove('hidden');
+  document.getElementById('goalModalTitle').textContent=id?'Edit Goal':'Add Goal';
+  tempImg='';
+  if(id){
+    let g=data.goals.find(x=>x.id===id);
+    if(g){document.getElementById('goalId').value=g.id;document.getElementById('goalTitle').value=g.title;document.getElementById('goalCategory').value=g.category;document.getElementById('goalWhy').value=g.why||'';tempImg=g.image||''}
+  }else{document.getElementById('goalId').value='';document.getElementById('goalTitle').value='';document.getElementById('goalWhy').value='';document.getElementById('goalImage').value=''}
+}
+function closeGoalModal(){document.getElementById('goalModal').classList.add('hidden')}
+function handleImg(input){
+  let f=input.files[0];if(!f)return;
+  let r=new FileReader();r.onload=e=>{tempImg=e.target.result};r.readAsDataURL(f);
+}
+function saveGoal(){
+  let id=document.getElementById('goalId').value,t=document.getElementById('goalTitle').value.trim();
+  if(!t)return alert('Title required');
+  let obj={id:id||Date.now().toString(),title:t,category:document.getElementById('goalCategory').value,why:document.getElementById('goalWhy').value.trim(),image:tempImg};
+  if(id){let i=data.goals.findIndex(x=>x.id===id);if(i>-1)data.goals[i]=obj}else data.goals.push(obj);
+  saveData();closeGoalModal();renderVision();
+}
+function editGoal(id){openGoalModal(id)}
+function deleteGoal(id){if(confirm('Delete this goal?')){data.goals=data.goals.filter(x=>x.id!==id);saveData();renderVision()}}
+
+// ─── TRACKER (CHECKLIST) ─────────────────────────
+function renderTracker(){
+  renderChecklist();
+  renderContacts();
+}
+function renderChecklist(){
+  let c=document.getElementById('checklistContainer');
+  c.innerHTML=data.checklist.map((it,i)=>`<div class="checklist-item${it.done?' checked':''}">
+    <input type="checkbox" ${it.done?'checked':''} onchange="toggleCheck(${i})">
+    <input class="edit-input" value="${esc(it.text)}" onblur="updateCheckText(${i},this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+  </div>`).join('');
+  renderScoreRing(document.getElementById('trackerScore'),document.getElementById('trackerTier'));
+}
+function toggleCheck(i){data.checklist[i].done=!data.checklist[i].done;saveData();renderChecklist()}
+function updateCheckText(i,v){data.checklist[i].text=v.trim()||data.checklist[i].text;saveData()}
+function resetChecklist(){if(confirm('Reset all items to unchecked?')){data.checklist.forEach(x=>x.done=false);saveData();renderChecklist()}}
+
+// ─── NETWORKING ───────────────────────────────────
+function renderContacts(){
+  let today=todayStr(),body=document.getElementById('contactsBody');
+  let list=data.contacts;
+  if(netFilter==='overdue')list=list.filter(c=>c.nextFollowUp&&c.nextFollowUp<today);
+  else if(netFilter!=='all')list=list.filter(c=>c.status.toLowerCase()===netFilter);
+
+  body.innerHTML=list.length?list.map(c=>{
+    let over=c.nextFollowUp&&c.nextFollowUp<today;
+    return`<tr class="${over?'overdue':''}">
+      <td><strong>${esc(c.name)}</strong><br><span class="text-sm text-muted">${esc(c.role||'')}</span></td>
+      <td class="text-sm">${esc(c.company||'')}</td>
+      <td><span class="status-${c.status.toLowerCase()}">${c.status}</span></td>
+      <td class="text-sm">${c.nextFollowUp||'—'}${over?' ⚠️':''}</td>
+      <td class="actions">
+        <button class="btn btn-sm btn-ghost" onclick="editContact('${c.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteContact('${c.id}')">×</button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="5" class="text-muted text-sm" style="text-align:center;padding:2rem">No contacts found.</td></tr>';
+}
+function setNetFilter(f,btn){
+  netFilter=f;
+  document.querySelectorAll('[data-nf]').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderContacts();
+}
+function openContactModal(id){
+  document.getElementById('contactModal').classList.remove('hidden');
+  document.getElementById('contactModalTitle').textContent=id?'Edit Contact':'Add Contact';
+  if(id){
+    let c=data.contacts.find(x=>x.id===id);
+    if(c){document.getElementById('contactId').value=c.id;document.getElementById('cName').value=c.name;document.getElementById('cCompany').value=c.company||'';document.getElementById('cRole').value=c.role||'';document.getElementById('cStatus').value=c.status;document.getElementById('cLast').value=c.lastContact||'';document.getElementById('cNext').value=c.nextFollowUp||'';document.getElementById('cNotes').value=c.notes||''}
+  }else{['contactId','cName','cCompany','cRole','cNotes'].forEach(id=>document.getElementById(id).value='');document.getElementById('cLast').value='';document.getElementById('cNext').value='';document.getElementById('cStatus').value='Cold'}
+}
+function closeContactModal(){document.getElementById('contactModal').classList.add('hidden')}
+function saveContact(){
+  let n=document.getElementById('cName').value.trim();if(!n)return alert('Name required');
+  let id=document.getElementById('contactId').value;
+  let obj={id:id||Date.now().toString(),name:n,company:document.getElementById('cCompany').value.trim(),role:document.getElementById('cRole').value.trim(),status:document.getElementById('cStatus').value,lastContact:document.getElementById('cLast').value,nextFollowUp:document.getElementById('cNext').value,notes:document.getElementById('cNotes').value.trim()};
+  if(id){let i=data.contacts.findIndex(x=>x.id===id);if(i>-1)data.contacts[i]=obj}else data.contacts.push(obj);
+  saveData();closeContactModal();renderContacts();
+}
+function editContact(id){openContactModal(id)}
+function deleteContact(id){if(confirm('Delete contact?')){data.contacts=data.contacts.filter(x=>x.id!==id);saveData();renderContacts()}}
+
+// ─── UTILS ────────────────────────────────────────
+function esc(s){let d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function todayStr(){return new Date().toISOString().slice(0,10)}
+
+// ─── INIT ─────────────────────────────────────────
+loadData();
+document.getElementById('quoteText').textContent=`"${QUOTES[0]}"`;
+setInterval(rotateQuote,5000);
+renderDashboard();
+</script>
+</body>
+</html>
